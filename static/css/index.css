@@ -1,0 +1,33 @@
+body
+{
+    padding: 0 10% 0 10%;
+    height: 100vh;
+}
+
+.post
+{
+    width: 100%;
+}
+
+.post .post-pfp-container
+{
+    width: 5%;
+    min-width: 40px;
+    margin-right: 10px;
+}
+
+.post .post-pfp
+{
+    border-radius: 50%;
+    width: 100%;
+}
+
+.post .post-content
+{
+    width: 100%;
+}
+
+.post .post-text
+{
+    white-space: pre-line;
+}
