@@ -1,11 +1,10 @@
 {% extends "index.html" %}
+
 {% block content %}
 <div class="position-relative">
     <div class="position-absolute top-25 start-0 pe-5 position-fixed" style="transform: translateX(10vw); width: 20%;">
-        <form id="post-form" method="post">
-            <textarea class="w-100" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"' placeholder="What's on your mind?" required form="post-form" style="resize: none;"></textarea>
-            <input type="submit" value="Tweet">
-        </form>
+        <textarea id="post-text" class="w-100" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"' placeholder="What's on your mind?" style="resize: none;" maxlength="280"></textarea>
+        <button id="post-button">Tweet</button>
     </div>
     <div class="w-50 h-100 position-absolute top-0 start-50 translate-middle-x">
         <div class="post">
@@ -29,50 +28,30 @@
             </div>
             <hr>
         </div>
-        <div class="post">
-            <div class="d-flex align-top">
-                <div class="post-pfp-container">
-                    <img class="post-pfp" src="{{url_for('static', filename='images/pfp.png')}}">
-                </div>
-                <div class="post-content">
-                    <div class="post-title">
-                        <span class="post-name">Amir Rado</span>
-                        <span> · </span>
-                        <span class="post-time">3h</span>
-                    </div>
-                    <p class="post-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat aliquam vitae aliquid optio quod nam incidunt beatae. Explicabo suscipit earum dignissimos. Nulla maiores repellendus provident unde nemo hic veritatis incidunt porro accusantium odit ratione, officia nesciunt consequuntur vitae. Dolore, assumenda quae ex tempore ratione deserunt, harum voluptas numquam, dolorum distinctio quo labore iusto reiciendis sint sit! Dolorum porro nemo voluptatum cum magni, tempore voluptates aspernatur atque minima architecto, ab nostrum, corrupti maiores veniam perspiciatis ducimus doloribus ratione id facere itaque. Recusandae quo pariatur laborum rerum cum accusantium voluptas ea deserunt officia ipsum expedita, amet provident earum, quia perferendis eum laudantium.</p>
-                </div>
-            </div>
-            <div>
-                <i class="material-icons">favorite_border</i>
-                <span></span>
-                <span></span>
-            </div>
-            <hr>
-        </div>
-        <div class="post">
-            <div class="d-flex align-top">
-                <div class="post-pfp-container">
-                    <img class="post-pfp" src="{{url_for('static', filename='images/pfp.png')}}">
-                </div>
-                <div class="post-content">
-                    <div class="post-title">
-                        <span class="post-name">Amir Rado</span>
-                        <span> · </span>
-                        <span class="post-time">3h</span>
-                    </div>
-                    <p class="post-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat aliquam vitae aliquid optio quod nam incidunt beatae. Explicabo suscipit earum dignissimos. Nulla maiores repellendus provident unde nemo hic veritatis incidunt porro accusantium odit ratione, officia nesciunt consequuntur vitae. Dolore, assumenda quae ex tempore ratione deserunt, harum voluptas numquam, dolorum distinctio quo labore iusto reiciendis sint sit! Dolorum porro nemo voluptatum cum magni, tempore voluptates aspernatur atque minima architecto, ab nostrum, corrupti maiores veniam perspiciatis ducimus doloribus ratione id facere itaque. Recusandae quo pariatur laborum rerum cum accusantium voluptas ea deserunt officia ipsum expedita, amet provident earum, quia perferendis eum laudantium.</p>
-                </div>
-            </div>
-            <div>
-                <i class="material-icons">favorite_border</i>
-                <span></span>
-                <span></span>
-            </div>
-            <hr>
-        </div>
     </div>
 </div>
-    
-    
+{% endblock %}
+
+{% block script %}
+<script>
+    // Make tweet button send an api post request to post a tweet
+    const postBtn = document.getElementById("post-button");
+    const postTxt = document.getElementById("post-text");
+
+    postBtn.addEventListener("click", function(e){
+        const data = {"text": postTxt.value};
+
+        fetch(window.location.origin + "/api/post-tweet", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {"Content-type": "application/json; charset=UTF-8"}
+        })
+        .then(response => response.json())
+        .then(response => {
+            if(response.done){
+                location.reload()
+            }
+        });
+    });
+</script>
 {% endblock %}
