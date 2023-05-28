@@ -1,14 +1,7 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from home import homeBP
+# main.py - the script that starts the web app
 
-DB_NAME = "database.db"
+from app import create_app
 
-app = Flask(__name__)
-app.config ['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
-
-db = SQLAlchemy(app)
-
-app.register_blueprint(homeBP)
+app = create_app()
 
 app.run(host="0.0.0.0", port=5050, debug=True)
