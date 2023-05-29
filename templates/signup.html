@@ -1,0 +1,44 @@
+{% extends "auth.html" %}
+
+{% block content %}
+<div class="login-form">
+    <form method="post" enctype = "multipart/form-data">
+        <h2 class="text-center">Signup</h2> 
+        <div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                      {% if category == 'message' %}
+                        <div class="alert alert-warning" role="alert">
+                      {% else %}
+                        <div class="alert alert-{{ category }}" role="alert">
+                      {% endif %}
+                        {{ message }}
+                      </div>
+                  {% endfor %}
+                {% endif %}
+            {% endwith %}
+          </div>      
+        <div class="form-group">
+            <input name="username" type="text" class="form-control" placeholder="Username" required="required">
+        </div>
+        <div class="form-group">
+            <input name="email" type="email" class="form-control" placeholder="Email" required="required">
+        </div>
+        <div class="form-group">
+            <input name="password" type="password" class="form-control" placeholder="Password" required="required">
+        </div>
+        <div class="form-group">
+            <label class="ms-1" for="pfp">Profile Picture</label>
+            <input id="pfp" name="pfp" type="file" class="form-control">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">Signup</button>
+        </div>
+    </form>
+    <p class="text-center"><a href="login">Already Have an Account?</a></p>
+</div>
+{% endblock %}
+
+{% block script %}
+{% endblock %}
