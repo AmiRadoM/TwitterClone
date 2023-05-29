@@ -26,6 +26,7 @@
 			{%if current_user.is_authenticated%}
 			<p class="text-center mb-0">
 				<span>Hello {{current_user.username}}</span>
+				<img id="user_pfp">
 				<button onclick='window.location.href="auth/logout"' type="button" class="btn btn-outline-primary mb-1">Logout</button>
 			</p>
 			{%else%}
@@ -50,6 +51,27 @@
 
 	{% block script %}
 	{% endblock %}
+	<script>
+		// Function for getting a profile picture
+		function set_pfp(user_id, element){
+			const data = {"user_id": user_id};
+	
+			fetch(window.location.origin + "/api/pfp", {
+				method: "POST",
+				body: JSON.stringify(data),
+				headers: {"Content-type": "application/json; charset=UTF-8"}
+			})
+			.then(response => response.blob())
+			.then(response => {
+				element.src = URL.createObjectURL(response);
+			});
+		}
+	</script>
+	<script>
+		{% if current_user.is_authenticated %}
+			set_pfp({{current_user.id}} ,document.getElementById("user_pfp"))
+		{% endif %}
+	</script>
 </body>
 
 </html>

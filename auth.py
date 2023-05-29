@@ -68,7 +68,7 @@ def signup():
             db.session.commit()
             if(f != None):
                 from app import UPLOAD_PATH
-                f.save(UPLOAD_PATH + f"/pfp/{newUser.id}{fFormat}")
+                f.save(UPLOAD_PATH + f"/pfp/{newUser.id}.jpg")
             
             login_user(newUser)
             return redirect(url_for("home.home"))

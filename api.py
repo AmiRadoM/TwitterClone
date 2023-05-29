@@ -1,25 +1,73 @@
 # api.py - all the routes of the API
 
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify, Response, send_file
+from flask_login import login_required, current_user
 
 import json
+import random
 
-from models import db, Tweet
+from models import db, Tweet, User
+import utils
 
 apiBP = Blueprint('api', __name__, url_prefix="/api")
 
 @apiBP.route("/post-tweet", methods=["POST"])
+@login_required
 def post_tweet():
-    #post a tweet
+    # post a tweet
+    # gets: [text: str (the text in the tweet)]
 
     data = json.loads(request.data)
 
     if(len(data["text"]) > 280):
         return Response("Tweet text exceeded 280 characters", 400)
-
-    #TODO associate tweet to a user    
-    newTweet = Tweet(text=data["text"])
+ 
+    newTweet = Tweet(text=data["text"], user_id=current_user.id)
     db.session.add(newTweet)
     db.session.commit()
 
     return jsonify({"done": True})
+
+@apiBP.route("/get-tweet", methods=["POST"])
+def get_tweet():
+    # get a tweet by its id
+    # gets: [tweet_id: int (the id of the tweet)]
+
+    tweet_id = json.loads(request.data)["tweet_id"]
+
+    tweet = Tweet.query.get(tweet_id)
+
+    return jsonify({"user_id": tweet.user_id, "text": tweet.text})
+
+@apiBP.route("/recommend-tweets", methods=["POST"])
+def recommend_tweets():
+    # recommends tweets (for now just sends random tweets)
+    # gets: [user_id: int (the id of the user), amount: int (how many tweets to recommend)]
+
+    data = json.loads(request.data)
+
+    maxIndex = Tweet.query.count()
+    tweets = random.sample([*range(1, maxIndex+1)], utils.clamp(data["amount"],0,maxIndex))
+
+    return jsonify({"tweets": tweets})
+
+@apiBP.route("/profile", methods=["POST"])
+def profile():
+    # get a profile data by user id
+    # gets: [user_id: int (the id of the user)]
+
+    user_id = str(json.loads(request.data)["user_id"])
+
+    user = User.query.get(user_id)
+
+    return jsonify({"username": user.username, "email": user.email})
+
+@apiBP.route("/pfp", methods=["POST"])
+def pfp():
+    # get a profile picture by user id
+    # gets: [user_id: int (the id of the user)]
+
+    user_id = str(json.loads(request.data)["user_id"])
+
+    from app import UPLOAD_PATH
+    return send_file(UPLOAD_PATH + f"/pfp/{user_id}.jpg", mimetype="image/jpg")

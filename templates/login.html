@@ -3,7 +3,22 @@
 {% block content %}
 <div class="login-form">
     <form method="post">
-        <h2 class="text-center">Login</h2>       
+        <h2 class="text-center">Login</h2> 
+        <div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                      {% if category == 'message' %}
+                        <div class="alert alert-warning" role="alert">
+                      {% else %}
+                        <div class="alert alert-{{ category }}" role="alert">
+                      {% endif %}
+                        {{ message }}
+                      </div>
+                  {% endfor %}
+                {% endif %}
+            {% endwith %}
+          </div>            
         <div class="form-group">
             <input name="email" type="email" class="form-control" placeholder="Email" required="required">
         </div>
