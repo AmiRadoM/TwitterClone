@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 
 import json
 import random
+from datetime import datetime, timezone
 
 from models import db, Tweet, User
 import utils
@@ -19,10 +20,12 @@ def post_tweet():
 
     data = json.loads(request.data)
 
-    if(len(data["text"]) > 280):
+    if(len(data["text"].rstrip().lstrip()) > 280):
         return Response("Tweet text exceeded 280 characters", 400)
+    elif(data["text"].strip() == ""):
+        return Response("Tweet is empty", 400)
  
-    newTweet = Tweet(text=data["text"], user_id=current_user.id)
+    newTweet = Tweet(text=data["text"].rstrip().lstrip(), user_id=current_user.id)
     db.session.add(newTweet)
     db.session.commit()
 
@@ -30,14 +33,25 @@ def post_tweet():
 
 @apiBP.route("/get-tweet", methods=["POST"])
 def get_tweet():
-    # get a tweet by its id
+    # get a tweets data by its id
     # gets: [tweet_id: int (the id of the tweet)]
 
     tweet_id = json.loads(request.data)["tweet_id"]
 
     tweet = Tweet.query.get(tweet_id)
 
-    return jsonify({"user_id": tweet.user_id, "text": tweet.text})
+    tweet_age = datetime.utcnow() - tweet.time
+
+    if(int(tweet_age.days) > 0): # Days
+        time_ago = tweet.time.strftime("%B %d %Y")
+    elif(int(tweet_age.seconds / 3600) > 0): # Hours
+        time_ago = str(int(tweet_age.seconds / 3600)) + " hour" + ("s" if int(tweet_age.seconds / 3600) != 1 else "") + " ago"
+    elif(int(tweet_age.seconds / 60) > 0): # Minutes
+        time_ago = str(int(tweet_age.seconds / 60)) + " minute" + ("s" if int(tweet_age.seconds / 60) != 1 else "") + " ago"
+    else: # Seconds (just say now)
+        time_ago = "now"
+
+    return jsonify({"user_id": tweet.user_id, "text": tweet.text, "time_ago": time_ago})
 
 @apiBP.route("/recommend-tweets", methods=["POST"])
 def recommend_tweets():
