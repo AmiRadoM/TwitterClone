@@ -44,6 +44,8 @@ def signup():
         fName = secure_filename(f.filename)
         fFormat = os.path.splitext(fName)[1]
 
+        print(f)
+
         if(len(password) < 8):
             flash("Password needs to be at least 8 characters long", "error")
         elif(len(password) > 128):
@@ -60,13 +62,13 @@ def signup():
             flash("Username isn't appropriate (Should include english characters)", "error")
         elif(User.query.filter_by(username=username).first() != None):
             flash("Username is already in use", 'error')
-        elif f != None and (fName == '' or fFormat not in ['.png', '.jpg', '.jpeg']):
+        elif fName != '' and fFormat not in ['.png', '.jpg', '.jpeg']:
             flash("Profile picture needs to be in the following formats: .png, .jpg, .jpeg", 'error')
         else:
             newUser = User(username=username, email = email, password=generate_password_hash(password, method='sha256'))
             db.session.add(newUser)
             db.session.commit()
-            if(f != None):
+            if(fName != ''):
                 from app import UPLOAD_PATH
                 f.save(UPLOAD_PATH + f"/pfp/{newUser.id}.jpg")
             

@@ -5,9 +5,10 @@ from flask_login import login_required, current_user
 
 import json
 import random
-from datetime import datetime, timezone
+from datetime import datetime
+import os
 
-from models import db, Tweet, User
+from models import db, Tweet, User, Like
 import utils
 
 apiBP = Blueprint('api', __name__, url_prefix="/api")
@@ -51,7 +52,34 @@ def get_tweet():
     else: # Seconds (just say now)
         time_ago = "now"
 
-    return jsonify({"user_id": tweet.user_id, "text": tweet.text, "time_ago": time_ago})
+    liked = False
+    if(current_user.is_authenticated):
+        if(Like.query.filter_by(user_id = current_user.id, tweet_id=tweet_id).first()):
+            liked = True
+
+    return jsonify({"user_id": tweet.user_id, "text": tweet.text, "time_ago": time_ago, "likes": len(tweet.likes), "liked": liked})
+
+@apiBP.route("/like-tweet", methods=["POST"])
+@login_required
+def like_tweet():
+    # give a tweet a like
+    # gets: [tweet_id: int (the id of the tweet)]
+
+    tweet_id = json.loads(request.data)["tweet_id"]
+
+    possible_like = Like.query.filter_by(user_id=current_user.id, tweet_id=tweet_id).first() #looking for a like that already exists
+
+    if possible_like:
+        # deleting the like
+        db.session.delete(possible_like)
+    else:
+        # creating the like
+        newLike = Like(user_id = current_user.id, tweet_id = tweet_id)
+        db.session.add(newLike)
+    
+    db.session.commit()
+
+    return jsonify({"done": True}) 
 
 @apiBP.route("/recommend-tweets", methods=["POST"])
 def recommend_tweets():
@@ -84,4 +112,7 @@ def pfp():
     user_id = str(json.loads(request.data)["user_id"])
 
     from app import UPLOAD_PATH
+    if(not os.path.exists(UPLOAD_PATH + f"/pfp/{user_id}.jpg")):
+        return Response("No profile picture", 500)
+
     return send_file(UPLOAD_PATH + f"/pfp/{user_id}.jpg", mimetype="image/jpg")

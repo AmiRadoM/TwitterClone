@@ -1,3 +1,4 @@
+/* index.html */
 body
 {
     padding: 0 10% 0 10%;
@@ -11,6 +12,7 @@ body
     object-fit: cover;
 }
 
+/* home.html */
 .post
 {
     width: 100%;
@@ -40,4 +42,17 @@ body
 .post .post-text
 {
     white-space: pre-line;
+}
+
+.like-button:hover{
+    color: deeppink;
+}
+
+.like-button.liked{
+    color: deeppink;
+}
+
+/* about.html */
+#about-container{
+    padding: 0 15% 0 15%;
 }

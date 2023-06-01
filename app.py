@@ -45,6 +45,7 @@ def create_app():
     # adding the models to the admin
     admin.add_view(ModelView(models.User, db.session))
     admin.add_view(ModelView(models.Tweet, db.session))
+    admin.add_view(ModelView(models.Like, db.session))
 
     # initiating the LoginManager
     @lm.user_loader

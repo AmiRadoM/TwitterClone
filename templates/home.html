@@ -2,8 +2,15 @@
 
 {% block content %}
 <div class="position-relative">
-    <div class="top-25 start-0 pe-5 position-fixed float-right" style="transform: translateX(10vw); width: 20%;">
+    <div class="top-25 start-0 pe-5 position-fixed float-right z-1" style="transform: translateX(10vw); width: 20%;">
         <textarea id="post-text" class="w-100" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px";validate_tweet(this)' placeholder="What's on your mind?" style="resize: none; white-space: pre-line;" maxlength="280"></textarea>
+        <div class="dropdown">
+            <button class="btn border-0 p-0" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                <i class="material-icons">mood</i>
+            </button>
+            <ul id="emoji-dropdown" class="dropdown-menu border-0 position-absolute z-3">
+            </ul>
+        </div>
         <div class="w-100 position-relative">
             <button id="post-button" class="btn btn-primary position-absolute end-0" >Tweet</button>
         </div>
@@ -12,21 +19,22 @@
         <div class="post" style="display: none;">
             <div class="d-flex align-top">
                 <div class="post-pfp-container">
-                    <img class="post-pfp" src="{{url_for('static', filename='images/pfp.png')}}">
+                    <img class="post-pfp">
                 </div>
                 <div class="post-content">
                     <div class="post-title">
                         <span class="post-name">Amir Rado</span>
                         <span> · </span>
-                        <span class="post-time">3h</span>
+                        <span class="post-time"></span>
                     </div>
                     <p class="post-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat aliquam vitae aliquid optio quod nam incidunt beatae. Explicabo suscipit earum dignissimos. Nulla maiores repellendus provident unde nemo hic veritatis incidunt porro accusantium odit ratione, officia nesciunt consequuntur vitae. Dolore, assumenda quae ex tempore ratione deserunt, harum voluptas numquam, dolorum distinctio quo labore iusto reiciendis sint sit! Dolorum porro nemo voluptatum cum magni, tempore voluptates aspernatur atque minima architecto, ab nostrum, corrupti maiores veniam perspiciatis ducimus doloribus ratione id facere itaque. Recusandae quo pariatur laborum rerum cum accusantium voluptas ea deserunt officia ipsum expedita, amet provident earum, quia perferendis eum laudantium.</p>
                 </div>
             </div>
-            <div>
-                <i class="material-icons">favorite_border</i>
-                <span></span>
-                <span></span>
+            <div class="px-5">
+                <button type="button" class="btn border-0 p-0 like-button">
+                    <i class="material-icons align-middle">favorite_border</i>
+                    <span class="align-middle post-like">0</span>
+                </button>
             </div>
             <hr>
         </div>
@@ -37,6 +45,7 @@
 {% block script %}
 <script>
     // Make tweet button send an api post request to post a tweet
+    
     const postBtn = document.getElementById("post-button");
     const postTxt = document.getElementById("post-text");
 
@@ -60,6 +69,26 @@
     });
 </script>
 <script>
+    // implement emoji picker to the tweet textarea
+    // github repo: https://github.com/missive/emoji-mart
+
+    const pickerOptions = {
+    onEmojiSelect:function(data){
+        text_area = document.getElementById("post-text")
+        const [start, end] = [text_area.selectionStart, text_area.selectionEnd];
+        text_area.setRangeText(data.native, start, end, "end");
+    },
+    set: "twitter",
+    theme: "light",
+    skinTonePosition: "search",
+}
+    const picker = new EmojiMart.Picker(pickerOptions)
+
+    document.getElementById("emoji-dropdown").appendChild(picker)
+
+    
+</script>
+<script>
     // Validate text for tweet
     function validate_tweet(input){
         if(/^\s/.test(input.value))
@@ -67,7 +96,8 @@
     }
 </script>
 <script>
-    // Getting 150 tweets for the user to view (need to think what to do after they view all the 150 tweets)
+    // Getting 150 tweets for the user to view 
+    // TODO need to think what to do after they view all the 150 tweets
 
     post_temp = document.getElementsByClassName("post").item(0)
 
@@ -97,10 +127,22 @@
                 name_element = new_post.getElementsByClassName("post-name").item(0)
                 time_element = new_post.getElementsByClassName("post-time").item(0)
                 text_element = new_post.getElementsByClassName("post-text").item(0)
+                like_element = new_post.getElementsByClassName("post-like").item(0)
+                like_button = new_post.getElementsByClassName("like-button").item(0)
                 
                 text_element.innerText = response.text
 
                 time_element.textContent = response.time_ago
+
+                like_element.textContent = response.likes
+
+                like_button.onclick = function(){like(this,tweet_id)}
+                
+                if(response.liked){
+                    like_button.getElementsByTagName("i").item(0).innerHTML="favorite"
+                    like_button.classList.add("liked")
+                }
+                
 
                 set_username(response.user_id, name_element)
 
@@ -122,6 +164,36 @@
         .then(response => response.json())
         .then(response => {
             text_element.textContent = response.username
+        });
+    }
+</script>
+<script>
+    // Like function for the like button
+
+    function like(e, tweet_id){
+        const data = {"tweet_id": tweet_id};
+
+        fetch(window.location.origin + "/api/like-tweet", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {"Content-type": "application/json; charset=UTF-8"}
+        })
+        .then(response => response.json())
+        .then(response => {
+            if(response.done){
+                if(e.classList.contains("liked")){
+                    // Unlike
+                    e.getElementsByTagName("i").item(0).innerHTML="favorite_border"
+                    e.getElementsByTagName("span").item(0).textContent--
+                    e.classList.remove("liked")
+                }
+                else{
+                    // Like
+                    e.getElementsByTagName("i").item(0).innerHTML="favorite"
+                    e.getElementsByTagName("span").item(0).textContent++
+                    e.classList.add("liked")
+                }
+            }
         });
     }
 </script>
