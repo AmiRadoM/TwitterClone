@@ -33,7 +33,6 @@ class Tweet(db.Model):
     user = db.relationship("User", overlaps="tweets")
     text = db.Column(db.String(280))
     time = db.Column(db.DateTime(timezone=True), default=func.now())
-    #TODO add likes to tweets (show the number of likes on the tweet and for each user the abillity to see their liked tweets)
     likes = db.relationship("Like", cascade="all, delete")
 
 class Like(db.Model):

@@ -3,14 +3,14 @@
 {% block content %}
 <div class="position-relative">
     <div class="top-25 start-0 pe-5 position-fixed float-right z-1" style="transform: translateX(10vw); width: 20%;">
-        <textarea id="post-text" class="w-100" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px";validate_tweet(this)' placeholder="What's on your mind?" style="resize: none; white-space: pre-line;" maxlength="280"></textarea>
-        <div class="dropdown">
-            <button class="btn border-0 p-0" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                <i class="material-icons">mood</i>
-            </button>
-            <ul id="emoji-dropdown" class="dropdown-menu border-0 position-absolute z-3">
-            </ul>
-        </div>
+            <textarea id="post-text" class="w-100" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px";validate_tweet(this)' placeholder="What's on your mind?" style="resize: none; white-space: pre-line;" maxlength="280"></textarea>
+            <div class="dropdown-center position-absolute end-0 bottom-0">
+                <button class="btn border-0 p-0" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    <i class="material-icons">mood</i>
+                </button>
+                <ul id="emoji-dropdown" class="dropdown-menu border-0 position-absolute z-3">
+                </ul>
+            </div>
         <div class="w-100 position-relative">
             <button id="post-button" class="btn btn-primary position-absolute end-0" >Tweet</button>
         </div>

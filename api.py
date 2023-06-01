@@ -2,10 +2,11 @@
 
 from flask import Blueprint, request, jsonify, Response, send_file
 from flask_login import login_required, current_user
+import sqlalchemy.sql.functions
 
 import json
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 
 from models import db, Tweet, User, Like
@@ -41,7 +42,7 @@ def get_tweet():
 
     tweet = Tweet.query.get(tweet_id)
 
-    tweet_age = datetime.utcnow() - tweet.time
+    tweet_age = datetime.now(timezone.utc) - tweet.time
 
     if(int(tweet_age.days) > 0): # Days
         time_ago = tweet.time.strftime("%B %d %Y")
@@ -88,10 +89,13 @@ def recommend_tweets():
 
     data = json.loads(request.data)
 
-    maxIndex = Tweet.query.count()
-    tweets = random.sample([*range(1, maxIndex+1)], utils.clamp(data["amount"],0,maxIndex))
+    tweets = Tweet.query.order_by(sqlalchemy.sql.functions.random()).limit(data["amount"]).all()
 
-    return jsonify({"tweets": tweets})
+    tweet_ids = []
+    for t in tweets:
+        tweet_ids.append(t.id)
+
+    return jsonify({"tweets": tweet_ids})
 
 @apiBP.route("/profile", methods=["POST"])
 def profile():

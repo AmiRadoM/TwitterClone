@@ -10,7 +10,6 @@ from flask_login import LoginManager
 from os import path
 
 db = SQLAlchemy()
-DB_NAME = "database.db"
 UPLOAD_PATH = "./static/upload"
 
 migrate = Migrate()
@@ -19,7 +18,7 @@ def create_app():
     # initializing the flask app
     app = Flask(__name__)
     app.secret_key = 'im secret'
-    app.config ['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    app.config ['SQLALCHEMY_DATABASE_URI'] = f'postgresql:///twitter'
     app.config['UPLOAD_FOLDER'] = UPLOAD_PATH
     app.config['MAX_CONTENT_PATH'] = 6000000
 
@@ -37,10 +36,7 @@ def create_app():
     app.register_blueprint(apiBP)
     app.register_blueprint(authBP)
 
-    # creating the database (if doesn't exist)
     import models
-    if not path.exists(DB_NAME):
-        db.create_all(app=app)
 
     # adding the models to the admin
     admin.add_view(ModelView(models.User, db.session))
