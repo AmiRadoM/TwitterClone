@@ -4,8 +4,9 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install -r requirements.txt
+RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 EXPOSE 5050
 
-CMD [ "python3", "main.py"]
+ENTRYPOINT ["./docker-enterypoint.sh"]

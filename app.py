@@ -8,6 +8,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
 
 from os import path
+import psycopg2
 
 db = SQLAlchemy()
 UPLOAD_PATH = "./static/upload"
@@ -18,7 +19,7 @@ def create_app():
     # initializing the flask app
     app = Flask(__name__)
     app.secret_key = 'im secret'
-    app.config ['SQLALCHEMY_DATABASE_URI'] = f'postgresql:///twitter'
+    app.config ['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://user:pass@db/twitter'
     app.config['UPLOAD_FOLDER'] = UPLOAD_PATH
     app.config['MAX_CONTENT_PATH'] = 6000000
 
