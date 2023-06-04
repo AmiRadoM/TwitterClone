@@ -153,4 +153,6 @@ cython_debug/
 
 *.db
 static/upload/pfp/*
+migrations/versions/*
+postgres-data
 !.gitkeep

@@ -4,17 +4,17 @@ Twitter Clone is a showcase of my skills in fullstack
 
 ## Installation
 
-Git clone this repository
-
+1. Git clone this repository
 ```console
 $ git clone git@github.com:AmiRadoM/TwitterClone.git
 ```
-Install [Docker](https://www.docker.com/products/docker-desktop/)
+
+2. Install [Docker](https://www.docker.com/products/docker-desktop/)
 
 ## Usage
 
 ```console
-$ docker compose up --build
+$ docker compose up --no-recreate
 ```
 
 ## License

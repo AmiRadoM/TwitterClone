@@ -5,7 +5,8 @@ services:
   api:
     build: .
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://user:pass@db/twitter
     networks:
@@ -28,3 +29,10 @@ services:
     ports:
       - 5405:5432
     restart: always
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready --dbname=twitter --timeout=5 --username=user
+      interval: 3s
+      timeout: 5s
+      retries: 5
