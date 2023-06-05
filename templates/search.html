@@ -1,0 +1,84 @@
+{% extends "home.html" %}
+
+{% block content_script %}
+<script>
+    // Show the results for the search
+    // TODO if I will make a recommendation system I should redo this script (maybe put it in a popup under the search bar)
+
+    {%if tweets|length > 0%}
+    tweets = []
+
+    {%for tweet_id in tweets%}
+    tweets.push("{{tweet_id}}")
+    {%endfor%}
+
+    title_search = document.createElement("h3")
+    title_search.innerHTML = "Search Results"
+
+    document.getElementById("post-container").appendChild(title_search)
+
+    post_temp = document.getElementsByClassName("post").item(0)
+    
+    tweets.forEach(tweet_id => {
+        const data = {"tweet_id": tweet_id};
+
+        fetch(window.location.origin + "/api/get-tweet", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {"Content-type": "application/json; charset=UTF-8"}
+        })
+        .then(response => response.json())
+        .then(response => {
+            new_post = post_temp.cloneNode(true)
+            new_post.style.display = "block"
+
+            pfp_element = new_post.getElementsByClassName("post-pfp").item(0)
+            name_element = new_post.getElementsByClassName("post-name").item(0)
+            time_element = new_post.getElementsByClassName("post-time").item(0)
+            text_element = new_post.getElementsByClassName("post-text").item(0)
+            like_element = new_post.getElementsByClassName("post-like").item(0)
+            like_button = new_post.getElementsByClassName("like-button").item(0)
+            
+            text_element.innerText = response.text
+
+            time_element.textContent = response.time_ago
+
+            like_element.textContent = response.likes
+
+            like_button.onclick = function(){like(this,tweet_id)}
+            
+            if(response.liked){
+                like_button.getElementsByTagName("i").item(0).innerHTML="favorite"
+                like_button.classList.add("liked")
+            }
+            
+
+            set_username(response.user_id, name_element)
+
+            set_pfp(response.user_id ,pfp_element)
+
+            document.getElementById("post-container").insertBefore(new_post, title_search.nextSibling)
+        });
+    });
+
+    function set_username(user_id, text_element){
+        const data = {"user_id": user_id};
+
+        fetch(window.location.origin + "/api/profile", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {"Content-type": "application/json; charset=UTF-8"}
+        })
+        .then(response => response.json())
+        .then(response => {
+            text_element.textContent = response.username
+        });
+    }
+    {%else%}
+    title_search = document.createElement("h3")
+    title_search.innerHTML = "No Results Found"
+
+    document.getElementById("post-container").appendChild(title_search)
+    {%endif%}
+</script>
+{% endblock %}

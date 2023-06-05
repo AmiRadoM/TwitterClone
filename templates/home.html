@@ -95,11 +95,18 @@
             input.value = '';
     }
 </script>
+{% block content_script %}
 <script>
     // Getting 150 tweets for the user to view 
     // TODO need to think what to do after they view all the 150 tweets
 
     post_temp = document.getElementsByClassName("post").item(0)
+
+    title_feed = document.createElement("h3")
+    title_feed.innerHTML = "Feed"
+
+    document.getElementById("post-container").appendChild(title_feed)
+
 
     const data = {"user_id": {%if current_user.is_authenticated%} {{current_user.id}} {%else%} -1 {%endif%}, "amount": 150}
 
@@ -148,7 +155,7 @@
 
                 set_pfp(response.user_id ,pfp_element)
 
-                document.getElementById("post-container").appendChild(new_post)
+                document.getElementById("post-container").insertBefore(new_post, title_feed.nextSibling)
             });
         });
     });
@@ -167,6 +174,7 @@
         });
     }
 </script>
+{% endblock %}
 <script>
     // Like function for the like button
 
